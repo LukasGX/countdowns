@@ -20,6 +20,10 @@ h1 {
 	padding: 1rem;
 }
 
+#countdowns-dynamic .countdown-block .time-left {
+	margin-bottom: 1rem;
+}
+
 .countdown-block {
 	background: white;
 	border-radius: 10px;

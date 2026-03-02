@@ -46,6 +46,11 @@ function getProgressStartTime(targetStr) {
 	return startTime;
 }
 
+// NEU: Speicherzeitpunkt für Custom zurückgeben
+function getCustomStartTime() {
+	return localStorage.getItem("customStartTime") || null;
+}
+
 function createCountdownElement(id, label, timeContent, showScale = false) {
 	const div = document.createElement("div");
 	if (showScale) div.className = "countdown-block bd";
@@ -98,10 +103,26 @@ function formatTime(diff) {
 	return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
+// Angepasst: Custom verwendet Speicherzeitpunkt
 function updateCountdown(id, targetStr, isFixed = false) {
 	const now = new Date();
-	const startStr = isFixed ? startTime : getProgressStartTime(targetStr);
-	const start = getTodayTime(startStr);
+
+	let startStr, start;
+
+	if (id === customId && !isFixed) {
+		// Custom: Von Speicherzeitpunkt aus
+		const customStart = getCustomStartTime();
+		if (customStart) {
+			startStr = customStart;
+		} else {
+			startStr = startTime; // Fallback falls kein Start gespeichert
+		}
+	} else {
+		// Normale Fixed/Dynamic Logik
+		startStr = isFixed ? startTime : getProgressStartTime(targetStr);
+	}
+
+	start = getTodayTime(startStr);
 	const target = getTodayTime(targetStr);
 
 	const isPast = now >= target;
@@ -198,6 +219,7 @@ function setupCustomEvents() {
 	if (editBtn && savedTime) {
 		editBtn.addEventListener("click", () => {
 			localStorage.removeItem("customTime");
+			localStorage.removeItem("customStartTime"); // Auch Startzeit löschen
 			startCountdown();
 		});
 	}
@@ -208,7 +230,12 @@ function setupCustomEvents() {
 		saveBtn.addEventListener("click", () => {
 			const newTime = document.getElementById("custom-time").value;
 			if (newTime) {
+				// **WICHTIG: Speicherzeitpunkt jetzt setzen**
 				localStorage.setItem("customTime", newTime);
+				localStorage.setItem(
+					"customStartTime",
+					new Date().toTimeString().slice(0, 5)
+				); // Aktuelle HH:MM
 				startCountdown();
 			}
 		});
@@ -228,7 +255,7 @@ function startCountdown() {
 			const now = new Date();
 			const target = getTodayTime(customTime);
 			if (now < target) {
-				updateCountdown(customId, customTime, true);
+				updateCountdown(customId, customTime, false); // **false** = Custom-Logik
 			} else {
 				// Erreicht → 00:00:00 + 100% bis Reload
 				document.getElementById("time" + customId).textContent =
