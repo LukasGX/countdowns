@@ -1,7 +1,7 @@
 // Ab wann der Fortschrittsbalken läuft (nur für erste Zeit)
 const startTime = "07:55";
 
-const fixedTimes = ["12:55", "17:00", "19:00"];
+const fixedTimes = ["12:55", "17:00"];
 
 const allTimes = [
 	"08:40",
@@ -19,6 +19,8 @@ const allTimes = [
 	"16:15",
 	"17:00"
 ];
+
+let customId = 3;
 
 function getTodayTime(hhmm) {
 	const [h, m] = hhmm.split(":").map(Number);
@@ -44,44 +46,44 @@ function getProgressStartTime(targetStr) {
 	return startTime;
 }
 
-function createCountdownElement(id, label, showScale = false) {
+function createCountdownElement(id, label, timeContent, showScale = false) {
 	const div = document.createElement("div");
 	if (showScale) div.className = "countdown-block bd";
 	else div.className = "countdown-block";
 
 	let html = `
-<div class="time-label">${label}</div>
-<div class="time-left ${showScale ? "mm" : ""}" id="time${id}">--:--:--</div>
-<div class="bar-container"><div class="bar" id="bar${id}"></div></div>
-`;
+        <div class="time-label">${label}</div>
+        <div class="time-display-container" id="time-display${id}">
+            ${timeContent}
+        </div>
+        <div class="time-left" id="time${id}">--:--:--</div>
+        <div class="bar-container"><div class="bar" id="bar${id}"></div></div>
+    `;
 
 	if (showScale) {
 		const wrapper = document.createElement("div");
 		wrapper.className = "progress-scale";
-
-		i = 0;
+		let i = 0;
 		while (i <= 100) {
 			const tick = document.createElement("div");
 			tick.className = "scale-tick";
 			tick.style.left = i + "%";
 
 			if (i % 10 === 0) {
-				const label = document.createElement("span");
-				label.className = "scale-label";
-				label.textContent = i + "%";
-				if (i === 0) label.classList.add("mvr");
-				if (i === 100) label.classList.add("mvl");
-				tick.appendChild(label);
+				const labelEl = document.createElement("span");
+				labelEl.className = "scale-label";
+				labelEl.textContent = i + "%";
+				if (i === 0) labelEl.classList.add("mvr");
+				if (i === 100) labelEl.classList.add("mvl");
+				tick.appendChild(labelEl);
 			} else if (i % 5 === 0) {
 				tick.classList.add("thin");
 			} else {
 				tick.classList.add("mini");
 			}
-
 			wrapper.appendChild(tick);
 			i += 1;
 		}
-
 		html += wrapper.outerHTML;
 	}
 
@@ -118,6 +120,26 @@ function updateCountdown(id, targetStr, isFixed = false) {
 		Math.min(Math.max(progress, 0), 100) + "%";
 }
 
+function createCustomTimeContent() {
+	const savedTime = localStorage.getItem("customTime");
+
+	if (savedTime) {
+		return `
+            <div class="time-display">
+                <span class="time">${savedTime}</span>
+                <button class="edit-btn" data-time="${savedTime}"><i class="fas fa-edit"></i></button>
+            </div>
+        `;
+	} else {
+		return `
+            <div class="time-display-container edit-mode">
+                <input type="time" id="custom-time" step="60" value="${savedTime || ""}">
+                <button id="save-custom"><i class="fas fa-save"></i></button>
+            </div>
+        `;
+	}
+}
+
 function buildCountdowns() {
 	const containerStatic = document.getElementById("countdowns-static");
 	const containerDynamic = document.getElementById("countdowns-dynamic");
@@ -126,36 +148,96 @@ function buildCountdowns() {
 
 	let id = 1;
 
-	// Feste Countdowns (OHNE Skala)
+	// 1. Feste Zeiten
 	fixedTimes.forEach((t) => {
 		containerStatic.appendChild(
 			createCountdownElement(
 				id,
-				`<span class="type">Feste Zeit</span> <span class="time">${t}</span>`,
+				`<span class="type">Feste Zeit</span>`,
+				`<div class="time-display"><span class="time">${t}</span></div>`,
 				false
 			)
 		);
 		id++;
 	});
 
-	// Dynamische Zeit (MIT Skala)
+	// 2. Custom Block (immer da - entweder Input oder gespeicherte Zeit)
+	const customContent = createCustomTimeContent();
+	containerStatic.appendChild(
+		createCountdownElement(
+			customId,
+			`<span class="type">Eigene Zeit</span>`,
+			customContent,
+			false
+		)
+	);
+	id++;
+
+	// 3. Dynamische Zeit
 	const nextDyn = getNextDynamicTime();
 	containerDynamic.appendChild(
 		createCountdownElement(
 			id,
-			`<span class="type">Dynamisch</span> <span class="time">${nextDyn}</span>`,
+			`<span class="type">Dynamisch</span>`,
+			`<div class="time-display"><span class="time">${nextDyn}</span></div>`,
 			true
 		)
 	);
 
+	// Event Listeners nach Build setzen
+	setupCustomEvents();
+
 	return { dynamicId: id, dynamicTime: nextDyn };
+}
+
+function setupCustomEvents() {
+	const savedTime = localStorage.getItem("customTime");
+
+	// Edit-Button falls gespeichert
+	const editBtn = document.querySelector(".edit-btn");
+	if (editBtn && savedTime) {
+		editBtn.addEventListener("click", () => {
+			localStorage.removeItem("customTime");
+			startCountdown();
+		});
+	}
+
+	// Save-Button falls Edit-Modus
+	const saveBtn = document.getElementById("save-custom");
+	if (saveBtn) {
+		saveBtn.addEventListener("click", () => {
+			const newTime = document.getElementById("custom-time").value;
+			if (newTime) {
+				localStorage.setItem("customTime", newTime);
+				startCountdown();
+			}
+		});
+	}
 }
 
 function startCountdown() {
 	const info = buildCountdowns();
 
 	function updateAll() {
+		// Fixed Times
 		fixedTimes.forEach((t, i) => updateCountdown(i + 1, t, true));
+
+		// Custom Time (falls vorhanden)
+		const customTime = localStorage.getItem("customTime");
+		if (customTime) {
+			const now = new Date();
+			const target = getTodayTime(customTime);
+			if (now < target) {
+				updateCountdown(customId, customTime, true);
+			} else {
+				// Erreicht → 00:00:00 + 100% bis Reload
+				document.getElementById("time" + customId).textContent =
+					"00:00:00";
+				document.getElementById("bar" + customId).style.width = "100%";
+			}
+		}
+
+		// Dynamic
 		updateCountdown(info.dynamicId, info.dynamicTime, false);
 	}
 
@@ -163,4 +245,5 @@ function startCountdown() {
 	setInterval(updateAll, 1000);
 }
 
+// Start
 startCountdown();
