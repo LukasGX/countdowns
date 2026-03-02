@@ -82,31 +82,6 @@ function createCountdownElement(id, label, showScale = false) {
 			i += 1;
 		}
 
-		// html += `
-		// <div class="progress-scale">
-		// <div class="scale-tick" style="left: 0%;"><span class="scale-label mvr">0%</span></div>
-		// <div class="scale-tick mini" style="left: 5%;"></div>
-		// <div class="scale-tick thin" style="left: 10%;"></div>
-		// <div class="scale-tick mini" style="left: 15%;"></div>
-		// <div class="scale-tick" style="left: 20%;"><span class="scale-label">20%</span></div>
-		// <div class="scale-tick mini" style="left: 25%;"></div>
-		// <div class="scale-tick thin" style="left: 30%;"></div>
-		// <div class="scale-tick mini" style="left: 35%;"></div>
-		// <div class="scale-tick" style="left: 40%;"><span class="scale-label">40%</span></div>
-		// <div class="scale-tick mini" style="left: 45%;"></div>
-		// <div class="scale-tick thin" style="left: 50%;"></div>
-		// <div class="scale-tick mini" style="left: 55%;"></div>
-		// <div class="scale-tick" style="left: 60%;"><span class="scale-label">60%</span></div>
-		// <div class="scale-tick mini" style="left: 65%;"></div>
-		// <div class="scale-tick thin" style="left: 70%;"></div>
-		// <div class="scale-tick mini" style="left: 75%;"></div>
-		// <div class="scale-tick" style="left: 80%;"><span class="scale-label">80%</span></div>
-		// <div class="scale-tick mini" style="left: 85%;"></div>
-		// <div class="scale-tick thin" style="left: 90%;"></div>
-		// <div class="scale-tick mini" style="left: 95%;"></div>
-		// <div class="scale-tick" style="left: 100%;"><span class="scale-label mvl">100%</span></div>
-		// </div>
-		// `;
 		html += wrapper.outerHTML;
 	}
 
