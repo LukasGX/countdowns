@@ -51,7 +51,14 @@ function getCustomStartTime() {
 	return localStorage.getItem("customStartTime") || null;
 }
 
-function createCountdownElement(id, label, timeContent, showScale = false) {
+function createCountdownElement(
+	id,
+	label,
+	timeContent,
+	showScale = false,
+	tinyScale = false,
+	smallerScale = false
+) {
 	const div = document.createElement("div");
 	if (showScale) div.className = "countdown-block bd";
 	else div.className = "countdown-block";
@@ -72,7 +79,10 @@ function createCountdownElement(id, label, timeContent, showScale = false) {
 		while (i <= 100) {
 			const tick = document.createElement("div");
 			tick.className = "scale-tick";
+			if (smallerScale) tick.classList.add("mini");
 			tick.style.left = i + "%";
+
+			let add = true;
 
 			if (i % 10 === 0) {
 				const labelEl = document.createElement("span");
@@ -82,11 +92,13 @@ function createCountdownElement(id, label, timeContent, showScale = false) {
 				if (i === 100) labelEl.classList.add("mvl");
 				tick.appendChild(labelEl);
 			} else if (i % 5 === 0) {
-				tick.classList.add("thin");
+				if (tinyScale) tick.classList.add("thin");
+				else add = false;
 			} else {
-				tick.classList.add("mini");
+				if (tinyScale) tick.classList.add("mini");
+				else add = false;
 			}
-			wrapper.appendChild(tick);
+			if (add) wrapper.appendChild(tick);
 			i += 1;
 		}
 		html += wrapper.outerHTML;
@@ -176,7 +188,9 @@ function buildCountdowns() {
 				id,
 				`<span class="type">Feste Zeit</span>`,
 				`<div class="time-display"><span class="time">${t}</span></div>`,
-				false
+				true,
+				false,
+				true
 			)
 		);
 		id++;
@@ -189,7 +203,9 @@ function buildCountdowns() {
 			customId,
 			`<span class="type">Eigene Zeit</span>`,
 			customContent,
-			false
+			true,
+			false,
+			true
 		)
 	);
 	id++;
@@ -201,7 +217,9 @@ function buildCountdowns() {
 			id,
 			`<span class="type">Dynamisch</span>`,
 			`<div class="time-display"><span class="time">${nextDyn}</span></div>`,
-			true
+			true,
+			true,
+			false
 		)
 	);
 
