@@ -163,3 +163,25 @@ h1 {
 .scale-label.mvl {
 	transform: translateX(-100%);
 }
+
+.infos {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	display: flex;
+	flex-direction: row;
+	gap: 0.2rem;
+
+	padding: 0.5rem;
+}
+
+.info {
+	background-color: rgba(0, 0, 0, 0.1);
+	padding: 0.4rem 0.8rem;
+	border-radius: 8px;
+}
+
+.thru {
+	text-decoration: line-through;
+}

@@ -57,10 +57,11 @@ function createCountdownElement(
 	timeContent,
 	showScale = false,
 	tinyScale = false,
-	smallerScale = false
+	smallerScale = false,
+	isDynamic = false
 ) {
 	const div = document.createElement("div");
-	if (showScale) div.className = "countdown-block bd";
+	if (isDynamic) div.className = "countdown-block bd";
 	else div.className = "countdown-block";
 
 	let html = `
@@ -71,6 +72,76 @@ function createCountdownElement(
         <div class="time-left" id="time${id}">--:--:--</div>
         <div class="bar-container"><div class="bar" id="bar${id}"></div></div>
     `;
+
+	if (isDynamic) {
+		fetch("/now", {
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`
+			}
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				const infos = document.createElement("div");
+				infos.className = "infos";
+
+				let rejection;
+				if (!data.authorized) {
+					rejection = document.createElement("div");
+					rejection.className = "info";
+					rejection.textContent = "Nicht autorisiert";
+					rejection.style.cursor = "pointer";
+					rejection.onclick = () => {
+						window.location.href = "/login";
+					};
+
+					infos.appendChild(rejection);
+					div.appendChild(infos);
+					return;
+				}
+
+				if (!data.lesson) {
+					rejection = document.createElement("div");
+					rejection.className = "info";
+					rejection.textContent = "Frei";
+					infos.appendChild(rejection);
+					div.appendChild(infos);
+					return;
+				}
+
+				const subjectInfo = document.createElement("div");
+				subjectInfo.className = "info";
+				subjectInfo.innerHTML = data.lesson.cancelled
+					? `<span class="thru">${data.lesson.subject_long}</span>`
+					: data.lesson.subject_long.length > 10
+						? data.lesson.subject
+						: data.lesson.subject_long;
+
+				let teacherInfo;
+				if (!data.lesson.cancelled) {
+					teacherInfo = document.createElement("div");
+					teacherInfo.className = "info";
+					teacherInfo.innerHTML = data.lesson.substitution
+						? `<span class="thru">${data.lesson.original_teacher}</span> ${data.lesson.teacher}`
+						: data.lesson.teacher;
+				}
+
+				let roomInfo;
+				if (!data.lesson.cancelled) {
+					roomInfo = document.createElement("div");
+					roomInfo.className = "info";
+					roomInfo.innerHTML = data.lesson.room_change
+						? `<span class="thru">${data.lesson.original_room}</span> ${data.lesson.room}`
+						: data.lesson.room;
+				}
+
+				infos.appendChild(subjectInfo);
+				if (!data.lesson.cancelled) {
+					infos.appendChild(teacherInfo);
+					infos.appendChild(roomInfo);
+				}
+				div.appendChild(infos);
+			});
+	}
 
 	if (showScale) {
 		const wrapper = document.createElement("div");
@@ -188,9 +259,10 @@ function buildCountdowns() {
 				id,
 				`<span class="type">Feste Zeit</span>`,
 				`<div class="time-display"><span class="time">${t}</span></div>`,
-				true,
-				false,
-				true
+				(showScale = true),
+				(tinyScale = false),
+				(smallerScale = true),
+				(isDynamic = false)
 			)
 		);
 		id++;
@@ -203,9 +275,10 @@ function buildCountdowns() {
 			customId,
 			`<span class="type">Eigene Zeit</span>`,
 			customContent,
-			true,
-			false,
-			true
+			(showScale = true),
+			(tinyScale = false),
+			(smallerScale = true),
+			(isDynamic = false)
 		)
 	);
 	id++;
@@ -217,9 +290,10 @@ function buildCountdowns() {
 			id,
 			`<span class="type">Dynamisch</span>`,
 			`<div class="time-display"><span class="time">${nextDyn}</span></div>`,
-			true,
-			true,
-			false
+			(showScale = true),
+			(tinyScale = true),
+			(smallerScale = false),
+			(isDynamic = true)
 		)
 	);
 
@@ -292,12 +366,3 @@ function startCountdown() {
 
 // Start
 startCountdown();
-
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker
-			.register("/sw.js")
-			.then((registration) => {})
-			.catch((error) => {});
-	});
-}
