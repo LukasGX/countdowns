@@ -215,9 +215,10 @@ function updateCountdown(id, targetStr, isFixed = false) {
 
 	if (isPast) {
 		progress = 100;
-		document.getElementById("time" + id).textContent = "00:00:00";
+		document.getElementById("time" + id).textContent = "00:00:00 / 100%";
 	} else {
-		document.getElementById("time" + id).textContent = formatTime(diff);
+		document.getElementById("time" + id).textContent =
+			`${formatTime(diff)} / ${progress.toFixed(2)}%`;
 	}
 
 	document.getElementById("bar" + id).style.width =
@@ -351,7 +352,7 @@ function startCountdown() {
 			} else {
 				// Erreicht → 00:00:00 + 100% bis Reload
 				document.getElementById("time" + customId).textContent =
-					"00:00:00";
+					"00:00:00 / 100%";
 				document.getElementById("bar" + customId).style.width = "100%";
 			}
 		}
@@ -361,7 +362,7 @@ function startCountdown() {
 	}
 
 	updateAll();
-	setInterval(updateAll, 1000);
+	setInterval(updateAll, 10);
 }
 
 // Start
