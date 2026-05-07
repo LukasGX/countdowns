@@ -13,11 +13,12 @@ h1 {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	gap: 1rem;
-	padding: 1rem;
+	padding: 0.5rem;
 }
 
-#countdowns-dynamic {
-	padding: 1rem;
+#countdowns-dynamic,
+#countdowns-own {
+	padding: 0.5rem;
 }
 
 #countdowns-dynamic .countdown-block .time-left {

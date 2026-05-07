@@ -247,8 +247,10 @@ function createCustomTimeContent() {
 
 function buildCountdowns() {
 	const containerStatic = document.getElementById("countdowns-static");
+	const containerOwn = document.getElementById("countdowns-own");
 	const containerDynamic = document.getElementById("countdowns-dynamic");
 	containerStatic.innerHTML = "";
+	containerOwn.innerHTML = "";
 	containerDynamic.innerHTML = "";
 
 	let id = 1;
@@ -269,9 +271,9 @@ function buildCountdowns() {
 		id++;
 	});
 
-	// 2. Custom Block (immer da - entweder Input oder gespeicherte Zeit)
+	// 2. Custom Block
 	const customContent = createCustomTimeContent();
-	containerStatic.appendChild(
+	containerOwn.appendChild(
 		createCountdownElement(
 			customId,
 			`<span class="type">Eigene Zeit</span>`,
