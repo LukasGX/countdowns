@@ -255,7 +255,7 @@ function buildCountdowns() {
 
 	let id = 1;
 
-	// 1. static times
+	// 1. static times 
 	fixedTimes.forEach((t) => {
 		containerStatic.appendChild(
 			createCountdownElement(
