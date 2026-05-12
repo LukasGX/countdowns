@@ -147,6 +147,12 @@ h1 {
 	top: -1.95rem;
 }
 
+.scale-tick.mini-fat {
+	width: 2px;
+	height: 1.4rem;
+	top: -1.95rem;
+}
+
 .scale-label {
 	position: absolute;
 	bottom: -1rem;

@@ -58,7 +58,9 @@ function createCountdownElement(
 	showScale = false,
 	tinyScale = false,
 	smallerScale = false,
-	isDynamic = false
+	isDynamic = false,
+	specialScale1255 = false,
+	specialScale1700 = false
 ) {
 	const div = document.createElement("div");
 	if (isDynamic) div.className = "countdown-block bd";
@@ -146,32 +148,99 @@ function createCountdownElement(
 	if (showScale) {
 		const wrapper = document.createElement("div");
 		wrapper.className = "progress-scale";
-		let i = 0;
-		while (i <= 100) {
-			const tick = document.createElement("div");
-			tick.className = "scale-tick";
-			if (smallerScale) tick.classList.add("mini");
-			tick.style.left = i + "%";
+		if (specialScale1255) {
+			const times = {
+				"1": "0%",
+				"2": "15%",
+				"P1": "30%",
+				"3": "35%",
+				"4": "50%",
+				"P2": "65%",
+				"5": "70%",
+				"6": "85%",
+				"": "100%"
+			}
 
-			let add = true;
+			for (const [label, pos] of Object.entries(times)) {
+				const tick = document.createElement("div");
+				tick.className = "scale-tick";
+				tick.classList.add("mini-fat");
+				tick.style.left = pos;
 
-			if (i % 10 === 0) {
 				const labelEl = document.createElement("span");
 				labelEl.className = "scale-label";
-				labelEl.textContent = i + "%";
-				if (i === 0) labelEl.classList.add("mvr");
-				if (i === 100) labelEl.classList.add("mvl");
+				labelEl.textContent = label;
+				if (label === "1") labelEl.classList.add("mvr");
+				if (label === "6") labelEl.classList.add("mvl");
 				tick.appendChild(labelEl);
-			} else if (i % 5 === 0) {
-				if (tinyScale) tick.classList.add("thin");
-				else add = false;
-			} else {
-				if (tinyScale) tick.classList.add("mini");
-				else add = false;
+
+				wrapper.appendChild(tick);
 			}
-			if (add) wrapper.appendChild(tick);
-			i += 1;
 		}
+		else if (specialScale1700) {
+			const times = {
+				"1": "0%",
+				"2": "8%",
+				"P1": "17%",
+				"3": "20%",
+				"4": "28%",
+				"P2": "36%",
+				"5": "39%",
+				"6": "47%",
+				"M": "56%",
+				"7": "67%",
+				"8": "75%",
+				"P3": "83%",
+				"9": "85%",
+				"10": "92%",
+				"": "100%"
+			}
+
+			for (const [label, pos] of Object.entries(times)) {
+				const tick = document.createElement("div");
+				tick.className = "scale-tick";
+				tick.classList.add("mini-fat");
+				tick.style.left = pos;
+
+				const labelEl = document.createElement("span");
+				labelEl.className = "scale-label";
+				labelEl.textContent = label;
+				if (label === "1") labelEl.classList.add("mvr");
+				if (label === "6") labelEl.classList.add("mvl");
+				tick.appendChild(labelEl);
+
+				wrapper.appendChild(tick);
+			}
+		}
+		else {
+			let i = 0;
+			while (i <= 100) {
+				const tick = document.createElement("div");
+				tick.className = "scale-tick";
+				if (smallerScale) tick.classList.add("mini");
+				tick.style.left = i + "%";
+
+				let add = true;
+
+				if (i % 10 === 0) {
+					const labelEl = document.createElement("span");
+					labelEl.className = "scale-label";
+					labelEl.textContent = i + "%";
+					if (i === 0) labelEl.classList.add("mvr");
+					if (i === 100) labelEl.classList.add("mvl");
+					tick.appendChild(labelEl);
+				} else if (i % 5 === 0) {
+					if (tinyScale) tick.classList.add("thin");
+					else add = false;
+				} else {
+					if (tinyScale) tick.classList.add("mini");
+					else add = false;
+				}
+				if (add) wrapper.appendChild(tick);
+				i += 1;
+			}
+		}
+		
 		html += wrapper.outerHTML;
 	}
 
@@ -257,6 +326,7 @@ function buildCountdowns() {
 
 	// 1. static times 
 	fixedTimes.forEach((t) => {
+		const a = t == "12:55" ? true : false;
 		containerStatic.appendChild(
 			createCountdownElement(
 				id,
@@ -265,7 +335,9 @@ function buildCountdowns() {
 				(showScale = true),
 				(tinyScale = false),
 				(smallerScale = true),
-				(isDynamic = false)
+				(isDynamic = false),
+				(specialScale1255 = a),
+				(specialScale1700 = !a)
 			)
 		);
 		id++;
