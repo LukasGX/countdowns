@@ -170,8 +170,6 @@ function createCountdownElement(
 				const labelEl = document.createElement("span");
 				labelEl.className = "scale-label";
 				labelEl.textContent = label;
-				if (label === "1") labelEl.classList.add("mvr");
-				if (label === "6") labelEl.classList.add("mvl");
 				tick.appendChild(labelEl);
 
 				wrapper.appendChild(tick);
@@ -205,8 +203,6 @@ function createCountdownElement(
 				const labelEl = document.createElement("span");
 				labelEl.className = "scale-label";
 				labelEl.textContent = label;
-				if (label === "1") labelEl.classList.add("mvr");
-				if (label === "6") labelEl.classList.add("mvl");
 				tick.appendChild(labelEl);
 
 				wrapper.appendChild(tick);
